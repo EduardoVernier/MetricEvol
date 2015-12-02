@@ -8,9 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Repository repo;
-
-
+    char *path = "../test-repo/t3_sisop2/.git";
+    Repository repo(path);
 }
 
 MainWindow::~MainWindow()

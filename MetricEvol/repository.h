@@ -12,19 +12,22 @@
 #include "git2.h"
 
 
+
 class Repository
 {
 public:
-    Repository();
+    Repository(char *repo_path);
 
 private:
     git_repository *repo;
-    char *repo_path = "/home/eduardo/Desktop/MetricEvol/test-repo/knob/.git";
+
     void check_error(int error_code, const char *action);
 
 signals:
 
 public slots:
+protected:
+    void walk_repo();
 };
 
 #endif // REPOSITORY_H

@@ -1,4 +1,4 @@
-/*
+﻿/*
     Considering that the Qt wrapper for libgit2 could not build
     properly, all member of this class will be implemented in
     pure C form.
@@ -105,15 +105,47 @@ void Repository::walk_repo()
 
     git_oid oid;
     while (git_revwalk_next(&oid, walk) == 0) {
-      git_commit *c;
-      char oidstr[10] = {0};
-
-      git_commit_lookup(&c, repo, &oid);
-      git_oid_tostr(oidstr, 9, &oid);
-      qDebug("%s\n%s", oidstr,
-             git_commit_message(c));
-
-      git_commit_free(c);
+      list_commit_file_tree(oid);
     }
 }
 
+void Repository::list_commit_file_tree(git_oid oid)
+{
+    git_commit *c;
+    char oidstr[GIT_OID_HEXSZ+1] = {0};
+    oidstr[GIT_OID_HEXSZ] = '\n';
+
+    int error = git_commit_lookup(&c, repo, &oid);
+    check_error(error, "looking up commit");
+    git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, &oid);
+
+    // Parse Commit Tree
+    git_tree *tree;
+    git_commit_tree(&tree, c);
+
+    qDebug("%s\n%s", oidstr,
+           git_commit_message(c));
+
+    dfs_tree_walk(tree, c);
+
+    git_commit_free(c);
+}
+
+void Repository::dfs_tree_walk(git_tree *tree, git_commit *c)
+{
+    size_t cnt = git_tree_entrycount(tree);
+    char oidstr[GIT_OID_HEXSZ+1] = {0};
+    oidstr[GIT_OID_HEXSZ] = '\n';
+
+
+    for (size_t i = 0; i < cnt; i++)
+    {
+        git_object *objt;
+        const git_tree_entry *entry;
+        entry = git_tree_entry_byindex(tree, i);
+        git_tree_entry_to_object(&objt, repo, entry); // blob
+        git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, git_object_id(objt));
+        qDebug("%s - %s", git_tree_entry_name(entry), oidstr);
+    }
+
+}

@@ -15,6 +15,7 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
@@ -26,9 +27,12 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
+    QAction *OpenRepoMenuBar;
+    QAction *actionClone_new_repository;
     QWidget *centralWidget;
     QPushButton *pushButton;
     QMenuBar *menuBar;
+    QMenu *menuOpen;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -36,16 +40,22 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(400, 300);
+        MainWindow->resize(529, 411);
+        OpenRepoMenuBar = new QAction(MainWindow);
+        OpenRepoMenuBar->setObjectName(QStringLiteral("OpenRepoMenuBar"));
+        actionClone_new_repository = new QAction(MainWindow);
+        actionClone_new_repository->setObjectName(QStringLiteral("actionClone_new_repository"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         pushButton = new QPushButton(centralWidget);
         pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(130, 110, 99, 27));
+        pushButton->setGeometry(QRect(170, 70, 99, 27));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 25));
+        menuBar->setGeometry(QRect(0, 0, 529, 25));
+        menuOpen = new QMenu(menuBar);
+        menuOpen->setObjectName(QStringLiteral("menuOpen"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -53,6 +63,11 @@ public:
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         MainWindow->setStatusBar(statusBar);
+
+        menuBar->addAction(menuOpen->menuAction());
+        menuOpen->addAction(OpenRepoMenuBar);
+        menuOpen->addAction(actionClone_new_repository);
+        menuOpen->addSeparator();
 
         retranslateUi(MainWindow);
 
@@ -62,7 +77,10 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        OpenRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0));
+        actionClone_new_repository->setText(QApplication::translate("MainWindow", "Clone new repository", 0));
         pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
+        menuOpen->setTitle(QApplication::translate("MainWindow", "FIle", 0));
     } // retranslateUi
 
 };

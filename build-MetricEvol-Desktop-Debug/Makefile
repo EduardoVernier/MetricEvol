@@ -314,8 +314,7 @@ compiler_rcc_clean:
 compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_mainwindow.cpp
-moc_mainwindow.cpp: ../MetricEvol/repository.h \
-		../MetricEvol/mainwindow.h
+moc_mainwindow.cpp: ../MetricEvol/mainwindow.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/eduardo/Desktop/MetricEvol/MetricEvol -I/home/eduardo/Desktop/MetricEvol/libs/libgit2-0.23.4/build -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../MetricEvol/mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_source_make_all:
@@ -336,13 +335,12 @@ compiler_clean: compiler_moc_header_clean compiler_uic_clean
 
 ####### Compile
 
-main.o: ../MetricEvol/main.cpp ../MetricEvol/mainwindow.h \
-		../MetricEvol/repository.h
+main.o: ../MetricEvol/main.cpp ../MetricEvol/mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../MetricEvol/main.cpp
 
 mainwindow.o: ../MetricEvol/mainwindow.cpp ../MetricEvol/mainwindow.h \
-		../MetricEvol/repository.h \
-		ui_mainwindow.h
+		ui_mainwindow.h \
+		../MetricEvol/repository.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../MetricEvol/mainwindow.cpp
 
 repository.o: ../MetricEvol/repository.cpp ../MetricEvol/repository.h

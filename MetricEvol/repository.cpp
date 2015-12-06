@@ -82,8 +82,7 @@ void Repository::list_commit_file_tree(git_oid oid)
     git_tree *tree;
     git_commit_tree(&tree, c);
 
-    qDebug("%s - %s", oidstr,
-           git_commit_message(c));
+    //qDebug("%s - %s", oidstr, git_commit_message(c));
 
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree, oidstr);

@@ -22,15 +22,16 @@ private:
     git_repository *repo;
     void check_error(int error_code, const char *action);
     void list_commit_file_tree(git_oid oid);
-    void walk_repo();
-    void dfs_tree_walk(git_tree *tree, git_commit *c);
+    void walk_repository();
+    void dfs_tree_walk(git_tree *tree, char *commit_oid);
+    void write_blob(const git_oid *oid, char *commit_oid);
 
 signals:
 
 public slots:
-protected:
-};
 
-typedef struct { /* … */ } walk_data;
+protected:
+
+};
 
 #endif // REPOSITORY_H

@@ -8,8 +8,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "QDebug"
+#include "QRegExp"
+#include "QString"
 #include "git2.h"
-
+// Makes it Unix compatible only - fix it later
+#include <sys/stat.h>
+#include <sys/types.h>
 
 Repository::Repository(char* repo_path)
 {
@@ -23,60 +27,11 @@ Repository::Repository(char* repo_path)
     git_odb *odb;
     git_repository_odb(&odb, repo);
 
+    walk_repository();
 
-//    qDebug("\n*Commit Parsing*\n");
-
-//    git_commit *commit;
-//    git_oid oid;
-//    git_oid_fromstr(&oid, "7f5ffd65d7557857d170d9ba679deca8292265c7");
-//    char out[GIT_OID_HEXSZ+1];
-//    out[GIT_OID_HEXSZ] = '\0';
-
-//    error = git_commit_lookup(&commit, repo, &oid);
-//    check_error(error, "looking up commit");
-
-//    unsigned int parents, p;
-//    parents  = git_commit_parentcount(commit);
-//    for (p = 0;p < parents;p++) {
-//        git_commit *parent;
-//        git_commit_parent(&parent, commit, p);
-//        git_oid_fmt(out, git_commit_id(parent));
-//        qDebug("Parent: %s\n", out);
-//        git_commit_free(parent);
-//    }
-
-//    qDebug("\n*Tree Parsing*\n");
-//    const git_tree_entry *entry;
-//    git_tree *tree;
-//    git_object *objt;
-
-//    git_commit_tree(&tree, commit);
-
-//    size_t cnt = git_tree_entrycount(tree);
-//    qDebug("tree entries: %d\n", (int)cnt);
-
-//    entry = git_tree_entry_byindex(tree, 0);
-//    qDebug("Entry name: %s\n", git_tree_entry_name(entry)); // "hello.c"
-
-//    git_tree_entry_to_object(&objt, repo, entry); // blob
-
-//    git_blob *blob;
-//    size_t rawsize;
-//    const char *rawdata;
-
-//    git_blob_lookup(&blob, repo, git_tree_entry_id(entry));
-//    git_blob_rawcontent(blob);
-//    rawsize = git_blob_rawsize(blob);
-
-
-//    git_blob_free(blob);
-//    git_object_free(objt);
-
-    walk_repo();
     git_repository_free(repo);
 
 }
-
 
 
 void Repository::check_error(int error_code, const char *action)
@@ -91,22 +46,25 @@ void Repository::check_error(int error_code, const char *action)
     exit(1);
 }
 
-void Repository::walk_repo()
+void Repository::walk_repository()
 {
     // Create walker
     git_revwalk *walk;
-    if (git_revwalk_new(&walk, repo) < 0)
-    { /* ERROR */ }
+    int error = git_revwalk_new(&walk, repo);
+    check_error(error, "creating walker");
 
     // Configure walker
     git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
     git_revwalk_push_head(walk); // Start at repo HEAD
     git_revwalk_hide_glob(walk, "tags/*"); // Hide tags
 
+    // Iterate through commits and lookup file trees
     git_oid oid;
     while (git_revwalk_next(&oid, walk) == 0) {
       list_commit_file_tree(oid);
     }
+
+    //git_object_id(oid);
 }
 
 void Repository::list_commit_file_tree(git_oid oid)
@@ -123,29 +81,83 @@ void Repository::list_commit_file_tree(git_oid oid)
     git_tree *tree;
     git_commit_tree(&tree, c);
 
-    qDebug("%s\n%s", oidstr,
+    qDebug("%s - %s", oidstr,
            git_commit_message(c));
 
-    dfs_tree_walk(tree, c);
+    // Walk through all files in this specific commit (version)
+    dfs_tree_walk(tree, oidstr);
 
     git_commit_free(c);
 }
 
-void Repository::dfs_tree_walk(git_tree *tree, git_commit *c)
+void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
 {
+    // Count number of children nodes
     size_t cnt = git_tree_entrycount(tree);
     char oidstr[GIT_OID_HEXSZ+1] = {0};
     oidstr[GIT_OID_HEXSZ] = '\n';
-
 
     for (size_t i = 0; i < cnt; i++)
     {
         git_object *objt;
         const git_tree_entry *entry;
         entry = git_tree_entry_byindex(tree, i);
-        git_tree_entry_to_object(&objt, repo, entry); // blob
+        git_tree_entry_to_object(&objt, repo, entry);
         git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, git_object_id(objt));
-        qDebug("%s - %s", git_tree_entry_name(entry), oidstr);
-    }
+        const char *str_type = git_object_type2string(git_object_type(objt));
 
+        // An entry can be either a blob (file) or tree
+        if (strcmp("tree", str_type)==0)
+        {
+            // Recursive call if node is a tree
+            git_tree *subtree;
+            git_object *obj;
+            git_tree_entry_to_object(&obj, repo, entry);
+            int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
+            check_error(error, "walking the subtree");
+            dfs_tree_walk(subtree, commit_oid);
+        }
+        else if (strcmp("blob", str_type)==0) {
+            // Match only C++ source files
+            QString obj_str (git_tree_entry_name(entry));
+            QRegExp regex("^.+(.c|.h|.cpp|.cc)$");
+            if(regex.exactMatch(obj_str))
+            {
+                // Write file to a specific directory
+                write_blob(git_object_id(objt), commit_oid);
+            }
+        }
+    }
 }
+
+
+void Repository::write_blob(const git_oid *oid, char *commit_oid)
+{
+    git_blob *blob = NULL;
+    char oidstr[GIT_OID_HEXSZ+1] = {0};
+    oidstr[GIT_OID_HEXSZ] = '\n';
+
+    // Set blob (file) path as ./source_files/#commit_id/#blob_id
+    git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, oid);
+    QString dir_path =  "./source_files/"
+                        + QString(commit_oid)
+                        + "/";
+
+    QString file_path = dir_path
+                        + QString(oidstr);
+
+    // Open blob
+    int error = git_blob_lookup(&blob, repo, oid);
+    check_error(error, "opening blob");
+
+    // Create directory with the hierachy explained above
+    error = mkdir(dir_path.toStdString().c_str(), 0777); // Only Unix compatible
+
+    // Write blob on file
+    FILE *pFile;
+    pFile = fopen(file_path.toStdString().c_str(), "w");
+    fwrite(git_blob_rawcontent(blob), (size_t)git_blob_rawsize(blob), 1, pFile);
+    fclose (pFile);
+}
+
+

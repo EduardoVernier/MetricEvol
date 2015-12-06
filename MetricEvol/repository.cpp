@@ -11,7 +11,7 @@
 #include "QRegExp"
 #include "QString"
 #include "git2.h"
-// Makes it Unix compatible only - fix it later
+// Creating the directories makes it Unix compatible only - fix it later
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -29,6 +29,7 @@ Repository::Repository(char* repo_path)
 
     walk_repository();
 
+    git_odb_free(odb);
     git_repository_free(repo);
 
 }
@@ -40,7 +41,7 @@ void Repository::check_error(int error_code, const char *action)
     if (!error_code)
         return;
 
-    printf("Error %d %s - %s\n", error_code, action,
+    qDebug("Error %d %s - %s\n", error_code, action,
            (error && error->message) ? error->message : "???");
 
     exit(1);
@@ -64,7 +65,7 @@ void Repository::walk_repository()
       list_commit_file_tree(oid);
     }
 
-    //git_object_id(oid);
+    git_revwalk_free(walk);
 }
 
 void Repository::list_commit_file_tree(git_oid oid)
@@ -87,6 +88,7 @@ void Repository::list_commit_file_tree(git_oid oid)
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree, oidstr);
 
+    git_tree_free(tree);
     git_commit_free(c);
 }
 
@@ -127,6 +129,7 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
                 write_blob(git_object_id(objt), commit_oid);
             }
         }
+        git_object_free(objt);
     }
 }
 
@@ -137,7 +140,7 @@ void Repository::write_blob(const git_oid *oid, char *commit_oid)
     char oidstr[GIT_OID_HEXSZ+1] = {0};
     oidstr[GIT_OID_HEXSZ] = '\n';
 
-    // Set blob (file) path as ./source_files/#commit_id/#blob_id
+    // Set blob (source file) path as: ./source_files/#commit_id/#blob_id
     git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, oid);
     QString dir_path =  "./source_files/"
                         + QString(commit_oid)
@@ -158,6 +161,8 @@ void Repository::write_blob(const git_oid *oid, char *commit_oid)
     pFile = fopen(file_path.toStdString().c_str(), "w");
     fwrite(git_blob_rawcontent(blob), (size_t)git_blob_rawsize(blob), 1, pFile);
     fclose (pFile);
+
+    git_blob_free(blob);
 }
 
 

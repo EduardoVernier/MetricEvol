@@ -10,6 +10,7 @@
 #include "QDebug"
 #include "QRegExp"
 #include "QString"
+#include "QTime"
 #include "git2.h"
 // Creating the directories makes it Unix compatible only - fix it later
 #include <sys/stat.h>
@@ -17,6 +18,10 @@
 
 Repository::Repository(char* repo_path)
 {
+    // Time execution for reporting purposes
+    QTime t;
+    t.start();
+
     git_libgit2_init();
 
     // Opening repository
@@ -32,6 +37,7 @@ Repository::Repository(char* repo_path)
     git_odb_free(odb);
     git_repository_free(repo);
 
+    qDebug("Time elapsed: %d ms", t.elapsed());
 }
 
 
@@ -43,9 +49,9 @@ void Repository::check_error(int error_code, const char *action)
 
     qDebug("Error %d %s - %s\n", error_code, action,
            (error && error->message) ? error->message : "???");
-
     exit(1);
 }
+
 
 void Repository::walk_repository()
 {
@@ -70,6 +76,7 @@ void Repository::walk_repository()
     git_revwalk_free(walk);
 }
 
+
 void Repository::lookup_commit_file_tree(git_oid oid)
 {
     git_commit *c;
@@ -89,10 +96,11 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree, oidstr);
 
-    qDebug("Done.");
+    // qDebug("Done.");
     git_tree_free(tree);
     git_commit_free(c);
 }
+
 
 void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
 {

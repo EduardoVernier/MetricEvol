@@ -61,14 +61,16 @@ void Repository::walk_repository()
 
     // Iterate through commits and lookup file trees
     git_oid oid;
+    commit_sorted_index = 0; // Used for simpler visualization of tree, will not be necessary on future
     while (git_revwalk_next(&oid, walk) == 0) {
-      list_commit_file_tree(oid);
+      lookup_commit_file_tree(oid);
+      commit_sorted_index++;
     }
 
     git_revwalk_free(walk);
 }
 
-void Repository::list_commit_file_tree(git_oid oid)
+void Repository::lookup_commit_file_tree(git_oid oid)
 {
     git_commit *c;
     char oidstr[GIT_OID_HEXSZ+1] = {0};
@@ -87,6 +89,7 @@ void Repository::list_commit_file_tree(git_oid oid)
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree, oidstr);
 
+    qDebug("Done.");
     git_tree_free(tree);
     git_commit_free(c);
 }
@@ -125,7 +128,7 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
             if(regex.exactMatch(obj_str))
             {
                 // Write file to a specific directory
-                write_blob(git_object_id(objt), commit_oid);
+                write_blob(git_object_id(objt), commit_oid, git_tree_entry_name(entry));
             }
         }
         git_object_free(objt);
@@ -133,19 +136,23 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
 }
 
 
-void Repository::write_blob(const git_oid *oid, char *commit_oid)
+void Repository::write_blob(const git_oid *oid, char *commit_oid, const char* entry_name)
 {
     git_blob *blob = NULL;
     char oidstr[GIT_OID_HEXSZ+1] = {0};
     oidstr[GIT_OID_HEXSZ] = '\n';
 
-    // Set blob (source file) path as: ./source_files/#commit_id/#blob_id
+    // Set blob (source file) path as: ./source_files/commit_index-commit_id/filename-blob_id
     git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, oid);
     QString dir_path =  "./source_files/"
+                        + QString::number(commit_sorted_index)
+                        + "-"
                         + QString(commit_oid)
                         + "/";
 
     QString file_path = dir_path
+                        + QString(entry_name)
+                        + "-"
                         + QString(oidstr);
 
     // Open blob

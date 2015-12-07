@@ -17,7 +17,6 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
-#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
@@ -30,7 +29,6 @@ public:
     QAction *OpenRepoMenuBar;
     QAction *actionClone_new_repository;
     QWidget *centralWidget;
-    QPushButton *pushButton;
     QMenuBar *menuBar;
     QMenu *menuOpen;
     QToolBar *mainToolBar;
@@ -47,9 +45,6 @@ public:
         actionClone_new_repository->setObjectName(QStringLiteral("actionClone_new_repository"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        pushButton = new QPushButton(centralWidget);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(170, 70, 99, 27));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -79,7 +74,6 @@ public:
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
         OpenRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0));
         actionClone_new_repository->setText(QApplication::translate("MainWindow", "Clone new repository", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "PushButton", 0));
         menuOpen->setTitle(QApplication::translate("MainWindow", "FIle", 0));
     } // retranslateUi
 

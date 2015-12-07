@@ -21,10 +21,11 @@ public:
 private:
     git_repository *repo;
     void check_error(int error_code, const char *action);
-    void list_commit_file_tree(git_oid oid);
+    void lookup_commit_file_tree(git_oid oid);
     void walk_repository();
     void dfs_tree_walk(git_tree *tree, char *commit_oid);
-    void write_blob(const git_oid *oid, char *commit_oid);
+    void write_blob(const git_oid *oid, char *commit_oid, const char *entry_name);
+    int commit_sorted_index;
 
 signals:
 

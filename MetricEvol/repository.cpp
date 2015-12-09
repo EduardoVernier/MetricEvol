@@ -4,11 +4,12 @@
     pure C form.
 */
 
-#include "repository.h"
 #include <stdio.h>
 #include <string.h>
+#include "repository.h"
 #include "QDebug"
-#include "QRegExp"
+#include "QRegExp" // Pick one
+#include "QRegularExpression"
 #include "QString"
 #include "QTime"
 #include "git2.h"
@@ -24,9 +25,27 @@ Repository::Repository(char* repo_path)
 
     git_libgit2_init();
 
-    // Opening repository
-    int error = git_repository_open(&repo, repo_path);
-    check_error(error, "opening repository");
+    QRegularExpression re("\\w+.git$");
+    QRegularExpressionMatch match = re.match(repo_path);
+    if (match.hasMatch())
+    {
+        QString matched = match.captured(0);
+        const char *path = "./repo/";
+        int error = git_clone(&repo, repo_path, path, NULL);
+        check_error(error, "cloning repository");
+        qDebug("Time elapsed cloning: %d ms", t.elapsed());
+    }
+    else
+    {
+        // Opening repository
+        int error = git_repository_open(&repo, repo_path);
+        check_error(error, "opening repository");
+        qDebug("Time elapsed opening: %d ms", t.elapsed());
+    }
+
+
+
+    t.start();
 
     // Getting the repo object database
     git_odb *odb;
@@ -37,7 +56,7 @@ Repository::Repository(char* repo_path)
     git_odb_free(odb);
     git_repository_free(repo);
 
-    qDebug("Time elapsed: %d ms", t.elapsed());
+    qDebug("Time elapsed walking and writing to disc: %d ms", t.elapsed());
 }
 
 
@@ -51,6 +70,7 @@ void Repository::check_error(int error_code, const char *action)
            (error && error->message) ? error->message : "???");
     exit(1);
 }
+
 
 
 void Repository::walk_repository()
@@ -67,11 +87,8 @@ void Repository::walk_repository()
 
     // Iterate through commits and lookup file trees
     git_oid oid;
-    commit_sorted_index = 0; // Used for simpler visualization of tree, will not be necessary on future
-    while (git_revwalk_next(&oid, walk) == 0) {
-      lookup_commit_file_tree(oid);
-      commit_sorted_index++;
-    }
+    while (git_revwalk_next(&oid, walk) == 0)
+        lookup_commit_file_tree(oid);
 
     git_revwalk_free(walk);
 }
@@ -94,7 +111,7 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     //qDebug("%s - %s", oidstr, git_commit_message(c));
 
     // Walk through all files in this specific commit (version)
-    dfs_tree_walk(tree, oidstr);
+    dfs_tree_walk(tree);
 
     // qDebug("Done.");
     git_tree_free(tree);
@@ -102,7 +119,7 @@ void Repository::lookup_commit_file_tree(git_oid oid)
 }
 
 
-void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
+void Repository::dfs_tree_walk(git_tree *tree)
 {
     // Count number of children nodes
     size_t cnt = git_tree_entrycount(tree);
@@ -127,7 +144,7 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
             git_tree_entry_to_object(&obj, repo, entry);
             int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
             check_error(error, "walking the subtree");
-            dfs_tree_walk(subtree, commit_oid);
+            dfs_tree_walk(subtree);
         }
         else if (strcmp("blob", str_type)==0) {
             // Match only C++ source files
@@ -136,7 +153,7 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
             if(regex.exactMatch(obj_str))
             {
                 // Write file to a specific directory
-                write_blob(git_object_id(objt), commit_oid, git_tree_entry_name(entry));
+                write_blob(git_object_id(objt));
             }
         }
         git_object_free(objt);
@@ -144,7 +161,7 @@ void Repository::dfs_tree_walk(git_tree *tree, char* commit_oid)
 }
 
 
-void Repository::write_blob(const git_oid *oid, char *commit_oid, const char* entry_name)
+void Repository::write_blob(const git_oid *oid)
 {
     git_blob *blob = NULL;
     char oidstr[GIT_OID_HEXSZ+1] = {0};
@@ -152,16 +169,9 @@ void Repository::write_blob(const git_oid *oid, char *commit_oid, const char* en
 
     // Set blob (source file) path as: ./source_files/commit_index-commit_id/filename-blob_id
     git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, oid);
-    QString dir_path =  "./source_files/"
-                        + QString::number(commit_sorted_index)
-                        + "-"
-                        + QString(commit_oid)
-                        + "/";
+    QString dir_path =  "./source_files/";
 
-    QString file_path = dir_path
-                        + QString(entry_name)
-                        + "-"
-                        + QString(oidstr);
+    QString file_path = dir_path + QString(oidstr);
 
     // Open blob
     int error = git_blob_lookup(&blob, repo, oid);

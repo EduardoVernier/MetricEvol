@@ -26,8 +26,8 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *OpenRepoMenuBar;
-    QAction *actionClone_new_repository;
+    QAction *openRepoMenuBar;
+    QAction *cloneRepoMenuBar;
     QWidget *centralWidget;
     QMenuBar *menuBar;
     QMenu *menuOpen;
@@ -39,10 +39,10 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->resize(529, 411);
-        OpenRepoMenuBar = new QAction(MainWindow);
-        OpenRepoMenuBar->setObjectName(QStringLiteral("OpenRepoMenuBar"));
-        actionClone_new_repository = new QAction(MainWindow);
-        actionClone_new_repository->setObjectName(QStringLiteral("actionClone_new_repository"));
+        openRepoMenuBar = new QAction(MainWindow);
+        openRepoMenuBar->setObjectName(QStringLiteral("openRepoMenuBar"));
+        cloneRepoMenuBar = new QAction(MainWindow);
+        cloneRepoMenuBar->setObjectName(QStringLiteral("cloneRepoMenuBar"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         MainWindow->setCentralWidget(centralWidget);
@@ -60,8 +60,8 @@ public:
         MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuOpen->menuAction());
-        menuOpen->addAction(OpenRepoMenuBar);
-        menuOpen->addAction(actionClone_new_repository);
+        menuOpen->addAction(openRepoMenuBar);
+        menuOpen->addAction(cloneRepoMenuBar);
         menuOpen->addSeparator();
 
         retranslateUi(MainWindow);
@@ -72,8 +72,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        OpenRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0));
-        actionClone_new_repository->setText(QApplication::translate("MainWindow", "Clone new repository", 0));
+        openRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0));
+        cloneRepoMenuBar->setText(QApplication::translate("MainWindow", "Clone new repository", 0));
         menuOpen->setTitle(QApplication::translate("MainWindow", "FIle", 0));
     } // retranslateUi
 

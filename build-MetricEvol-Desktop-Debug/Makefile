@@ -50,11 +50,15 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../MetricEvol/main.cpp \
 		../MetricEvol/mainwindow.cpp \
-		../MetricEvol/repository.cpp moc_mainwindow.cpp
+		../MetricEvol/repository.cpp \
+		../MetricEvol/clonedialog.cpp moc_mainwindow.cpp \
+		moc_clonedialog.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		repository.o \
-		moc_mainwindow.o
+		clonedialog.o \
+		moc_mainwindow.o \
+		moc_clonedialog.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -114,9 +118,11 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../MetricEvol/MetricEvol.pro ../MetricEvol/mainwindow.h \
-		../MetricEvol/repository.h ../MetricEvol/main.cpp \
+		../MetricEvol/repository.h \
+		../MetricEvol/clonedialog.h ../MetricEvol/main.cpp \
 		../MetricEvol/mainwindow.cpp \
-		../MetricEvol/repository.cpp
+		../MetricEvol/repository.cpp \
+		../MetricEvol/clonedialog.cpp
 QMAKE_TARGET  = MetricEvol
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = MetricEvol
@@ -144,7 +150,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): ui_mainwindow.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h ui_clonedialog.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../MetricEvol/MetricEvol.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -286,9 +292,9 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MetricEvol/mainwindow.h ../MetricEvol/repository.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MetricEvol/main.cpp ../MetricEvol/mainwindow.cpp ../MetricEvol/repository.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../MetricEvol/mainwindow.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../MetricEvol/mainwindow.h ../MetricEvol/repository.h ../MetricEvol/clonedialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MetricEvol/main.cpp ../MetricEvol/mainwindow.cpp ../MetricEvol/repository.cpp ../MetricEvol/clonedialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MetricEvol/mainwindow.ui ../MetricEvol/clonedialog.ui $(DISTDIR)/
 
 
 clean:compiler_clean 
@@ -311,19 +317,25 @@ check: first
 
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_clonedialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_mainwindow.cpp
+	-$(DEL_FILE) moc_mainwindow.cpp moc_clonedialog.cpp
 moc_mainwindow.cpp: ../MetricEvol/mainwindow.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/eduardo/Desktop/MetricEvol/MetricEvol -I/home/eduardo/Desktop/MetricEvol/libs/libgit2-0.23.4/build -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../MetricEvol/mainwindow.h -o moc_mainwindow.cpp
 
+moc_clonedialog.cpp: ../MetricEvol/clonedialog.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64 -I/home/eduardo/Desktop/MetricEvol/MetricEvol -I/home/eduardo/Desktop/MetricEvol/libs/libgit2-0.23.4/build -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ../MetricEvol/clonedialog.h -o moc_clonedialog.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_mainwindow.h
+compiler_uic_make_all: ui_mainwindow.h ui_clonedialog.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_mainwindow.h
+	-$(DEL_FILE) ui_mainwindow.h ui_clonedialog.h
 ui_mainwindow.h: ../MetricEvol/mainwindow.ui
 	/usr/lib/x86_64-linux-gnu/qt5/bin/uic ../MetricEvol/mainwindow.ui -o ui_mainwindow.h
+
+ui_clonedialog.h: ../MetricEvol/clonedialog.ui
+	/usr/lib/x86_64-linux-gnu/qt5/bin/uic ../MetricEvol/clonedialog.ui -o ui_clonedialog.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -346,8 +358,15 @@ mainwindow.o: ../MetricEvol/mainwindow.cpp ../MetricEvol/mainwindow.h \
 repository.o: ../MetricEvol/repository.cpp ../MetricEvol/repository.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o repository.o ../MetricEvol/repository.cpp
 
+clonedialog.o: ../MetricEvol/clonedialog.cpp ../MetricEvol/clonedialog.h \
+		ui_clonedialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o clonedialog.o ../MetricEvol/clonedialog.cpp
+
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
+
+moc_clonedialog.o: moc_clonedialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_clonedialog.o moc_clonedialog.cpp
 
 ####### Install
 

@@ -14,12 +14,15 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    repository.cpp
+    repository.cpp \
+    clonedialog.cpp
 
 HEADERS  += mainwindow.h \
-    repository.h
+    repository.h \
+    clonedialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    clonedialog.ui
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../libs/libgit2-0.23.4/build/release/ -lgit2
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../libs/libgit2-0.23.4/build/debug/ -lgit2

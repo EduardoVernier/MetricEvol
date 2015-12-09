@@ -20,7 +20,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_OpenRepoMenuBar_triggered();
+    void on_openRepoMenuBar_triggered();
+
+    void on_cloneRepoMenuBar_triggered();
 
 private:
     Ui::MainWindow *ui;

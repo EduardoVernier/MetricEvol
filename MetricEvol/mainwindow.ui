@@ -27,8 +27,8 @@
     <property name="title">
      <string>FIle</string>
     </property>
-    <addaction name="OpenRepoMenuBar"/>
-    <addaction name="actionClone_new_repository"/>
+    <addaction name="openRepoMenuBar"/>
+    <addaction name="cloneRepoMenuBar"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuOpen"/>
@@ -42,12 +42,12 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="OpenRepoMenuBar">
+  <action name="openRepoMenuBar">
    <property name="text">
     <string>Open new repository</string>
    </property>
   </action>
-  <action name="actionClone_new_repository">
+  <action name="cloneRepoMenuBar">
    <property name="text">
     <string>Clone new repository</string>
    </property>

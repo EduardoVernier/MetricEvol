@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "clonedialog.h"
 #include "repository.h"
 #include "QFileDialog"
 
@@ -17,7 +17,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_OpenRepoMenuBar_triggered()
+void MainWindow::on_openRepoMenuBar_triggered()
 {
     QString fileName = QFileDialog::getExistingDirectory(this,
         tr("Find repository folder"),"../test-repo/", QFileDialog::ShowDirsOnly);
@@ -27,4 +27,11 @@ void MainWindow::on_OpenRepoMenuBar_triggered()
     strcpy(path, fileName.toStdString().c_str());
 
     Repository repository(path);
+}
+
+void MainWindow::on_cloneRepoMenuBar_triggered()
+{
+    CloneDialog cloneDialog;
+    cloneDialog.setModal(true);
+    cloneDialog.exec();
 }

@@ -20,12 +20,12 @@ public:
 
 private:
     git_repository *repo;
+    char *repo_dir_path;
     void check_error(int error_code, const char *action);
     void lookup_commit_file_tree(git_oid oid);
     void walk_repository();
-    void dfs_tree_walk(git_tree *tree, char *commit_oid);
-    void write_blob(const git_oid *oid, char *commit_oid, const char *entry_name);
-    int commit_sorted_index;
+    void dfs_tree_walk(git_tree *tree);
+    void write_blob(const git_oid *oid);
 
 signals:
 

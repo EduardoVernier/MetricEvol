@@ -73,7 +73,8 @@ void Repository::check_error(int error_code, const char *action)
 
 void Repository::walk_repository()
 {
-    // Create SHA-1 filled tree to avoid rewriting files to disc
+    // Create SHA-1 trie to avoid rewriting files to disc or
+    // walking trees that suffered no changes
     trie = new Trie;
 
     // Create walker
@@ -84,7 +85,6 @@ void Repository::walk_repository()
     // Configure walker
     git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
     git_revwalk_push_head(walk); // Start at repo HEAD
-    git_revwalk_hide_glob(walk, "tags/*"); // Hide tags
 
     // Iterate through commits and lookup file trees
     git_oid oid;
@@ -148,6 +148,7 @@ void Repository::dfs_tree_walk(git_tree *tree)
                 git_tree_entry_to_object(&obj, repo, entry);
                 int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
                 check_error(error, "walking the subtree");
+                // Add tree oid to trie
                 trie->addSHA1(oidstr);
                 dfs_tree_walk(subtree);
             }
@@ -164,7 +165,6 @@ void Repository::dfs_tree_walk(git_tree *tree)
                 }
             }
         }
-        else {int a = 1;}
         git_object_free(objt);
     }
 }

@@ -48,10 +48,9 @@ bool Trie::addSHA1(char *s)
             current->appendChild(tmp);
             current = tmp;
         }
-        if ( i == strlen(s) - 1 )
-        {
+        if (i == strlen(s)-1)
             current->setWordMarker();
-        }
+
     }
     return 0;
 }

@@ -4,7 +4,6 @@
 #include <vector>
 using namespace std;
 
-
 class Node
 {
 public:
@@ -18,7 +17,6 @@ public:
     vector<Node*> children() { return mChildren; }
 
 private:
-    unsigned int nSHA1;
     char mContent;
     bool mMarker;
     vector <Node*> mChildren;

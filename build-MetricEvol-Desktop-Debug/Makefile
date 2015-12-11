@@ -51,12 +51,14 @@ OBJECTS_DIR   = ./
 SOURCES       = ../MetricEvol/main.cpp \
 		../MetricEvol/mainwindow.cpp \
 		../MetricEvol/repository.cpp \
-		../MetricEvol/clonedialog.cpp moc_mainwindow.cpp \
+		../MetricEvol/clonedialog.cpp \
+		../MetricEvol/trie.cpp moc_mainwindow.cpp \
 		moc_clonedialog.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
 		repository.o \
 		clonedialog.o \
+		trie.o \
 		moc_mainwindow.o \
 		moc_clonedialog.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -119,10 +121,12 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		../MetricEvol/MetricEvol.pro ../MetricEvol/mainwindow.h \
 		../MetricEvol/repository.h \
-		../MetricEvol/clonedialog.h ../MetricEvol/main.cpp \
+		../MetricEvol/clonedialog.h \
+		../MetricEvol/trie.h ../MetricEvol/main.cpp \
 		../MetricEvol/mainwindow.cpp \
 		../MetricEvol/repository.cpp \
-		../MetricEvol/clonedialog.cpp
+		../MetricEvol/clonedialog.cpp \
+		../MetricEvol/trie.cpp
 QMAKE_TARGET  = MetricEvol
 DESTDIR       = #avoid trailing-slash linebreak
 TARGET        = MetricEvol
@@ -292,8 +296,8 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
-	$(COPY_FILE) --parents ../MetricEvol/mainwindow.h ../MetricEvol/repository.h ../MetricEvol/clonedialog.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../MetricEvol/main.cpp ../MetricEvol/mainwindow.cpp ../MetricEvol/repository.cpp ../MetricEvol/clonedialog.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../MetricEvol/mainwindow.h ../MetricEvol/repository.h ../MetricEvol/clonedialog.h ../MetricEvol/trie.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../MetricEvol/main.cpp ../MetricEvol/mainwindow.cpp ../MetricEvol/repository.cpp ../MetricEvol/clonedialog.cpp ../MetricEvol/trie.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../MetricEvol/mainwindow.ui ../MetricEvol/clonedialog.ui $(DISTDIR)/
 
 
@@ -352,15 +356,23 @@ main.o: ../MetricEvol/main.cpp ../MetricEvol/mainwindow.h
 
 mainwindow.o: ../MetricEvol/mainwindow.cpp ../MetricEvol/mainwindow.h \
 		ui_mainwindow.h \
-		../MetricEvol/repository.h
+		../MetricEvol/clonedialog.h \
+		../MetricEvol/repository.h \
+		../MetricEvol/trie.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../MetricEvol/mainwindow.cpp
 
-repository.o: ../MetricEvol/repository.cpp ../MetricEvol/repository.h
+repository.o: ../MetricEvol/repository.cpp ../MetricEvol/repository.h \
+		../MetricEvol/trie.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o repository.o ../MetricEvol/repository.cpp
 
 clonedialog.o: ../MetricEvol/clonedialog.cpp ../MetricEvol/clonedialog.h \
-		ui_clonedialog.h
+		ui_clonedialog.h \
+		../MetricEvol/repository.h \
+		../MetricEvol/trie.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o clonedialog.o ../MetricEvol/clonedialog.cpp
+
+trie.o: ../MetricEvol/trie.cpp ../MetricEvol/trie.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o trie.o ../MetricEvol/trie.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

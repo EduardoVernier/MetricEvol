@@ -43,8 +43,6 @@ Repository::Repository(char* repo_path)
         qDebug("Time elapsed opening: %d ms", t.elapsed());
     }
 
-
-
     t.start();
 
     // Getting the repo object database
@@ -55,6 +53,7 @@ Repository::Repository(char* repo_path)
 
     git_odb_free(odb);
     git_repository_free(repo);
+    delete trie;
 
     qDebug("Time elapsed walking and writing to disc: %d ms", t.elapsed());
 }
@@ -72,9 +71,11 @@ void Repository::check_error(int error_code, const char *action)
 }
 
 
-
 void Repository::walk_repository()
 {
+    // Create SHA-1 filled tree to avoid rewriting files to disc
+    trie = new Trie;
+
     // Create walker
     git_revwalk *walk;
     int error = git_revwalk_new(&walk, repo);
@@ -108,7 +109,7 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     git_tree *tree;
     git_commit_tree(&tree, c);
 
-    //qDebug("%s - %s", oidstr, git_commit_message(c));
+    // qDebug("%s - %s", oidstr, git_commit_message(c));
 
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree);
@@ -134,28 +135,36 @@ void Repository::dfs_tree_walk(git_tree *tree)
         git_tree_entry_to_object(&objt, repo, entry);
         git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, git_object_id(objt));
         const char *str_type = git_object_type2string(git_object_type(objt));
+        QString obj_str (git_tree_entry_name(entry));
 
-        // An entry can be either a blob (file) or tree
-        if (strcmp("tree", str_type)==0)
+        if(trie->searchSHA1(oidstr) == false)
         {
-            // Recursive call if node is a tree
-            git_tree *subtree;
-            git_object *obj;
-            git_tree_entry_to_object(&obj, repo, entry);
-            int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
-            check_error(error, "walking the subtree");
-            dfs_tree_walk(subtree);
-        }
-        else if (strcmp("blob", str_type)==0) {
-            // Match only C++ source files
-            QString obj_str (git_tree_entry_name(entry));
-            QRegExp regex("^.+(.c|.h|.cpp|.cc)$");
-            if(regex.exactMatch(obj_str))
+            // An entry can be either a blob (file) or tree
+            if (strcmp("tree", str_type)==0)
             {
-                // Write file to a specific directory
-                write_blob(git_object_id(objt));
+                // Recursive call if node is a tree
+                git_tree *subtree;
+                git_object *obj;
+                git_tree_entry_to_object(&obj, repo, entry);
+                int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
+                check_error(error, "walking the subtree");
+                trie->addSHA1(oidstr);
+                dfs_tree_walk(subtree);
+            }
+            else if (strcmp("blob", str_type)==0)
+            {
+                // Add file oid to trie
+                trie->addSHA1(oidstr);
+                // Match only C++ source files
+                QRegExp regex("^.+\\.(c|h|cpp|cc)$");
+                if(regex.exactMatch(obj_str))
+                {
+                    // Write file to a specific directory
+                    write_blob(git_object_id(objt));
+                }
             }
         }
+        else {int a = 1;}
         git_object_free(objt);
     }
 }

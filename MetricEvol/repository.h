@@ -10,7 +10,7 @@
 #include <QObject>
 #include <stdio.h>
 #include "git2.h"
-
+#include "trie.h"
 
 
 class Repository
@@ -21,6 +21,8 @@ public:
 private:
     git_repository *repo;
     char *repo_dir_path;
+    Trie *trie;
+
     void check_error(int error_code, const char *action);
     void lookup_commit_file_tree(git_oid oid);
     void walk_repository();

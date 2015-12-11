@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     repository.cpp \
-    clonedialog.cpp
+    clonedialog.cpp \
+    trie.cpp
 
 HEADERS  += mainwindow.h \
     repository.h \
-    clonedialog.h
+    clonedialog.h \
+    trie.h
 
 FORMS    += mainwindow.ui \
     clonedialog.ui

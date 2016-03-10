@@ -19,5 +19,5 @@ void CloneDialog::on_buttonBox_accepted()
     char path_str[256];
     strcpy(path_str, repo_path.toStdString().c_str());
 
-    Repository repository(path_str);
+    //Repository repository(path_str);
 }

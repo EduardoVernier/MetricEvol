@@ -2,6 +2,7 @@
 #define CLONEDIALOG_H
 
 #include <QDialog>
+#include <mainwindow.h>
 
 namespace Ui {
 class CloneDialog;

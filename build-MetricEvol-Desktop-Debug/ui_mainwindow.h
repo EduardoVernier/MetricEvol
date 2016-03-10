@@ -18,6 +18,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QWidget>
 
@@ -29,6 +30,7 @@ public:
     QAction *openRepoMenuBar;
     QAction *cloneRepoMenuBar;
     QWidget *centralWidget;
+    QTextEdit *textbox;
     QMenuBar *menuBar;
     QMenu *menuOpen;
     QToolBar *mainToolBar;
@@ -38,17 +40,20 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(529, 411);
+        MainWindow->resize(893, 809);
         openRepoMenuBar = new QAction(MainWindow);
         openRepoMenuBar->setObjectName(QStringLiteral("openRepoMenuBar"));
         cloneRepoMenuBar = new QAction(MainWindow);
         cloneRepoMenuBar->setObjectName(QStringLiteral("cloneRepoMenuBar"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        textbox = new QTextEdit(centralWidget);
+        textbox->setObjectName(QStringLiteral("textbox"));
+        textbox->setGeometry(QRect(20, 10, 851, 701));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 529, 25));
+        menuBar->setGeometry(QRect(0, 0, 893, 25));
         menuOpen = new QMenu(menuBar);
         menuOpen->setObjectName(QStringLiteral("menuOpen"));
         MainWindow->setMenuBar(menuBar);

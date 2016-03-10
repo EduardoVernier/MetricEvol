@@ -1,2 +1,4 @@
-./build-MetricEvol-Desktop-Debug/source-files/*
+./build-MetricEvol-Desktop-Debug/source_files/*
+./build-MetricEvol-Desktop-Debug/metrics/*
+./build-MetricEvol-Desktop-Debug/repo/*
 *~

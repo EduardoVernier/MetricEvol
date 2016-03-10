@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     repository.cpp \
     clonedialog.cpp \
-    trie.cpp
+    trie.cpp \
+    metricextractor.cpp
 
 HEADERS  += mainwindow.h \
     repository.h \
     clonedialog.h \
-    trie.h
+    trie.h \
+    metricextractor.h
 
 FORMS    += mainwindow.ui \
     clonedialog.ui

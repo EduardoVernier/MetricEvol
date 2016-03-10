@@ -4,6 +4,7 @@
 #include "repository.h"
 #include "QFileDialog"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -26,7 +27,7 @@ void MainWindow::on_openRepoMenuBar_triggered()
     char path[256];
     strcpy(path, fileName.toStdString().c_str());
 
-    Repository repository(path);
+    Repository repository(path, this);
 }
 
 void MainWindow::on_cloneRepoMenuBar_triggered()
@@ -34,4 +35,9 @@ void MainWindow::on_cloneRepoMenuBar_triggered()
     CloneDialog cloneDialog;
     cloneDialog.setModal(true);
     cloneDialog.exec();
+}
+
+void MainWindow::write_to_textbox(QString txt)
+{
+    ui->textbox->append(txt);
 }

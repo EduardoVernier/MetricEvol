@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cstdio>
 #include <memory>
-
 #include <QString>
 #include <QFile>
 #include <QTextStream>
@@ -17,7 +16,7 @@ public:
 
 private:
     QString exec(QString cmd);
-    int counter = 0;
+    int counter = 0; // Counts number extractions
 };
 
 #endif // METRICEXTRACTOR_H

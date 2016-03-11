@@ -4,16 +4,8 @@
     pure C form.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+
 #include "repository.h"
-#include "QDebug"
-#include "QRegExp" // Pick one
-#include "QRegularExpression"
-#include "QString"
-#include "QTime"
-#include "git2.h"
 // Creating the directories makes it Unix compatible only - fix it later
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -32,6 +24,7 @@ Repository::Repository(char* repo_path, int _number_of_samples)
     QRegularExpressionMatch match = re.match(repo_path);
     if (match.hasMatch())
     {
+        // Cloning repository to ./repo/
         QString matched = match.captured(0);
         const char *path = "./repo/";
         int error = git_clone(&repo, repo_path, path, NULL);
@@ -54,6 +47,7 @@ Repository::Repository(char* repo_path, int _number_of_samples)
 
     walk_repository();
 
+    // Cleanup
     git_odb_free(odb);
     git_repository_free(repo);
     delete trie;
@@ -62,7 +56,7 @@ Repository::Repository(char* repo_path, int _number_of_samples)
 
 }
 
-
+// Report error on qDebug
 void Repository::check_error(int error_code, const char *action)
 {
     const git_error *error = giterr_last();
@@ -74,6 +68,7 @@ void Repository::check_error(int error_code, const char *action)
     exit(1);
 }
 
+// Count number of commits in the repository - doesn't count merges
 void Repository::count_number_of_commits()
 {
     // Create walker
@@ -94,9 +89,9 @@ void Repository::count_number_of_commits()
     }
     git_revwalk_free(walk);
     commit_count = i;
-
 }
 
+// Walk between commits selecting which should be analysed (e.g. one every 20)
 void Repository::walk_repository()
 {
     count_number_of_commits();
@@ -110,19 +105,17 @@ void Repository::walk_repository()
     int error = git_revwalk_new(&walk, repo);
     check_error(error, "creating walker");
 
-    // Configure walker
+    // Configure walker to come from past to future
     git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_REVERSE );
     git_revwalk_push_head(walk); // Start at repo HEAD
 
     // Iterate through commits and lookup file trees
     commit_order_index = 0;
-    unsigned int i = 0;
     git_oid oid;
     int collection_interval = floor(commit_count/(number_of_samples)); // e.g. collect one version every 200 commits
-    while (git_revwalk_next(&oid, walk) == 0)
+    for (int i = 0; git_revwalk_next(&oid, walk) == 0; i++)
     {
-        i++;
-        if ( i%collection_interval == 0)
+        if (i % collection_interval == 0)
         {
             lookup_commit_file_tree(oid);
             commit_order_index++;
@@ -131,7 +124,7 @@ void Repository::walk_repository()
     git_revwalk_free(walk);
 }
 
-
+// Enter a commit tree and walk files
 void Repository::lookup_commit_file_tree(git_oid oid)
 {
     git_commit *c;
@@ -146,36 +139,29 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     git_tree *tree;
     git_commit_tree(&tree, c);
 
-
-
     // Walk through all files in this specific commit (version)
     dfs_tree_walk(tree);
 
-    // Delete files added from Vn-1 to Vn
+    // Delete files removed from Vn-1 to Vn
     sort(Lf.begin(), Lf.end());
     sort(Lr.begin(), Lr.end());
     vector<QString> difference;
-    set_difference(
-        Lf.begin(), Lf.end(),
-        Lr.begin(), Lr.end(),
-        std::back_inserter(difference));
+    set_difference(Lf.begin(), Lf.end(), Lr.begin(), Lr.end(), std::back_inserter(difference));
 
     for(vector<QString>::iterator it = difference.begin(); it != difference.end(); ++it)
         remove(it->toUtf8());
-
     Lf = Lr;
     Lr.clear();
 
-    // Run metrics extraction
+    // Run metrics extraction and log id and time on qDebug
     qDebug() <<  oidstr << " - " << metric_extractor.run_metrics();
 
-
-    // qDebug("Done.");
+    // Free git objects
     git_tree_free(tree);
     git_commit_free(c);
 }
 
-
+// Writes source files to a directory and manages trie to avoid unnecessary "downloads"
 void Repository::dfs_tree_walk(git_tree *tree)
 {
     // Count number of children nodes
@@ -193,14 +179,15 @@ void Repository::dfs_tree_walk(git_tree *tree)
         const char *str_type = git_object_type2string(git_object_type(objt));
         QString obj_str (git_tree_entry_name(entry));
 
+        // Add all source files from version to Lr
         QRegExp regex("^.+\\.(c|h|cpp|cc|java)$");
         if (regex.exactMatch(obj_str))
-            Lr.push_back(obj_str); // Add to Lr
+            Lr.push_back(obj_str);
 
-
+        // If file is already not downloaded (from previous commits)
         if(trie->searchSHA1(oidstr) == false)
         {
-            // An entry can be either a blob (file) or tree
+            // An entry can be either a blob (file) or tree (folder)
             if (strcmp("tree", str_type)==0)
             {
                 // Recursive call if node is a tree
@@ -209,18 +196,16 @@ void Repository::dfs_tree_walk(git_tree *tree)
                 git_tree_entry_to_object(&obj, repo, entry);
                 int error = git_tree_lookup(&subtree, repo, git_object_id(obj));
                 check_error(error, "walking the subtree");
-                // Add tree oid to trie
-                //trie->addSHA1(oidstr); -> commented to solve false deleted files
                 dfs_tree_walk(subtree);
             }
             else if (strcmp("blob", str_type)==0)
             {
-                // Add file oid to trie
+                // Add file oid to trie even if not source file - prevents from re-downloading it
                 trie->addSHA1(oidstr);
                 // Match only C++ and Java source files
                 if(regex.exactMatch(obj_str))
                 {
-                    // Write file to a specific directory
+                    // Write file to a specific directory - later to be analysed
                     write_blob(git_object_id(objt), obj_str);
                 }
             }
@@ -229,7 +214,8 @@ void Repository::dfs_tree_walk(git_tree *tree)
     }
 }
 
-
+// Write source file to ./source_files/ directory.
+// Using the same filename for different versions of the same file saves us from having to manage/delete old versions
 void Repository::write_blob(const git_oid *oid, QString filename)
 {
     git_blob *blob = NULL;
@@ -256,5 +242,3 @@ void Repository::write_blob(const git_oid *oid, QString filename)
 
     git_blob_free(blob);
 }
-
-

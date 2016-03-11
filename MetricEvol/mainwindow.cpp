@@ -1,9 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "clonedialog.h"
 #include "repository.h"
-#include "QFileDialog"
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,8 +32,4 @@ void MainWindow::on_cloneRepoMenuBar_triggered()
     CloneDialog cloneDialog;
     cloneDialog.setModal(true);
     cloneDialog.exec();
-}
-
-void MainWindow::write_to_textbox(QString txt)
-{
 }

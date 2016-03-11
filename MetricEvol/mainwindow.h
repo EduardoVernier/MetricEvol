@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QString>
 #include "git2.h"
+#include "clonedialog.h"
+#include "QFileDialog"
 
 namespace Ui {
 class MainWindow;
@@ -17,7 +19,6 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void write_to_textbox(QString txt);
 
 private slots:
     void on_openRepoMenuBar_triggered();

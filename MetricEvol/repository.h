@@ -8,8 +8,17 @@
 #define REPOSITORY_H
 
 #include <QObject>
+#include "QDebug"
+#include "QRegExp"
+#include "QRegularExpression"
+#include "QString"
+#include "QTime"
+
 #include <stdio.h>
 #include <vector>
+#include <string.h>
+#include <math.h>
+
 #include "git2.h"
 #include "trie.h"
 #include "metricextractor.h"

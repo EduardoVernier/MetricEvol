@@ -19,7 +19,7 @@ QString MetricExtractor::run_metrics()
     time.remove(QChar('"'), Qt::CaseInsensitive);
 
     QFile file("./metrics/times.txt");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return "error opening times file"; // fix later
 
     QTextStream out(&file);

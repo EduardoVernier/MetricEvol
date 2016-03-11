@@ -20,7 +20,7 @@ using namespace std;
 class Repository
 {
 public:
-    Repository(char *repo_path, MainWindow *_w);
+    Repository(char *repo_path, int _number_of_samples);
 
 private:
     git_repository *repo;
@@ -30,8 +30,10 @@ private:
     vector <QString> Lr; // list of filtered filenames in repository
     vector <QString> Lf; // list of filtered filenames in the working folder
     MetricExtractor metric_extractor;
-    MainWindow *w;
+    int commit_count;
+    int number_of_samples;
 
+    void count_number_of_commits();
     void check_error(int error_code, const char *action);
     void lookup_commit_file_tree(git_oid oid);
     void walk_repository();

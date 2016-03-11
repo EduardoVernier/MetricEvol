@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "repository.h"
 #include "QDebug"
 #include "QRegExp" // Pick one
@@ -18,10 +19,10 @@
 #include <sys/types.h>
 
 
-Repository::Repository(char* repo_path, MainWindow *_w)
+Repository::Repository(char* repo_path, int _number_of_samples)
 {
+    number_of_samples = _number_of_samples;
     // Time execution for reporting purposes
-    w = _w;
     QTime t;
     t.start();
 
@@ -57,7 +58,7 @@ Repository::Repository(char* repo_path, MainWindow *_w)
     git_repository_free(repo);
     delete trie;
 
-    qDebug("Time elapsed walking and writing to disc: %f\n",(t.elapsed()/1000.0));
+    qDebug("Total time elapsed processing repository: %fs\n",(t.elapsed()/1000.0));
 
 }
 
@@ -73,9 +74,33 @@ void Repository::check_error(int error_code, const char *action)
     exit(1);
 }
 
+void Repository::count_number_of_commits()
+{
+    // Create walker
+    git_revwalk *walk;
+    int error = git_revwalk_new(&walk, repo);
+    check_error(error, "creating walker");
+
+    // Configure walker
+    git_revwalk_sorting(walk, GIT_SORT_TOPOLOGICAL | GIT_SORT_REVERSE );
+    git_revwalk_push_head(walk); // Start at repo HEAD
+
+    // Iterate through commits and lookup file trees
+    unsigned int i = 0;
+    git_oid oid;
+    while (git_revwalk_next(&oid, walk) == 0)
+    {
+        i++;
+    }
+    git_revwalk_free(walk);
+    commit_count = i;
+
+}
 
 void Repository::walk_repository()
 {
+    count_number_of_commits();
+
     // Create SHA-1 trie to avoid rewriting files to disc or
     // walking trees that suffered no changes
     trie = new Trie;
@@ -93,14 +118,13 @@ void Repository::walk_repository()
     commit_order_index = 0;
     unsigned int i = 0;
     git_oid oid;
-    unsigned int collection_interval = 40; // e.g. collect one version every 200 commits
+    int collection_interval = floor(commit_count/(number_of_samples)); // e.g. collect one version every 200 commits
     while (git_revwalk_next(&oid, walk) == 0)
     {
         i++;
-        if ( i == collection_interval)
+        if ( i%collection_interval == 0)
         {
             lookup_commit_file_tree(oid);
-            i = 0;
             commit_order_index++;
         }
     }

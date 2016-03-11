@@ -27,7 +27,7 @@ void MainWindow::on_openRepoMenuBar_triggered()
     char path[256];
     strcpy(path, fileName.toStdString().c_str());
 
-    Repository repository(path, this);
+    Repository repository(path, ui->n_samples->value());
 }
 
 void MainWindow::on_cloneRepoMenuBar_triggered()
@@ -39,5 +39,4 @@ void MainWindow::on_cloneRepoMenuBar_triggered()
 
 void MainWindow::write_to_textbox(QString txt)
 {
-    ui->textbox->append(txt);
 }

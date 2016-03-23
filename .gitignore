@@ -1,39 +1,4 @@
-### Qt ###
-# C++ objects and libs
-
-*.slo
-*.lo
-*.o
-*.a
-*.la
-*.lai
-*.so
-*.dll
-*.dylib
-
-# Qt-es
-
-/.qmake.cache
-/.qmake.stash
-*.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
-*.moc
-moc_*.cpp
-qrc_*.cpp
-ui_*.h
-*build-*
-
-# QtCreator
-
-*.autosave
-
-#QtCtreator Qml
-*.qmlproject.user
-*.qmlproject.user.*
-
-#QtCtreator CMake
-CMakeLists.txt.user
-
+build-MetricEvol-Desktop-Debug/metrics/*
+build-MetricEvol-Desktop-Debug/repo/*
+build-MetricEvol-Desktop-Debug/source_files/*
 *~

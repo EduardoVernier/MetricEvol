@@ -12,7 +12,7 @@ class MetricExtractor
 {
 public:
     MetricExtractor();
-    QString run_metrics();
+    QString run_metrics(char *cmt);
 
 private:
     QString exec(QString cmd);

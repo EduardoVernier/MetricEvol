@@ -6,7 +6,7 @@ MetricExtractor::MetricExtractor()
     QFile::remove("./metrics/times.txt");
 }
 
-QString MetricExtractor::run_metrics()
+QString MetricExtractor::run_metrics(char * cmt)
 {
     // Folder being analysed - where only source files from a given version live
     QString project_folder_path = "/home/eduardo/Desktop/MetricEvol/build-MetricEvol-Desktop-Debug/source_files/";
@@ -28,11 +28,11 @@ QString MetricExtractor::run_metrics()
     time.remove(QChar('\n'), Qt::CaseInsensitive);
 
     // Save time in a file specifying each extraction it belongs
-    QFile file("./metrics/times.txt");
+    QFile file("./metrics/meta.txt");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return "error opening times file";
     QTextStream out(&file);
-    out << "m" << counter << ": " << time << "\n";
+    out << "m" << counter << ": " << cmt << " - "<<   time << "\n";
     counter++;
 
     return time;

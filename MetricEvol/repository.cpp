@@ -154,7 +154,7 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     Lr.clear();
 
     // Run metrics extraction and log id and time on qDebug
-    qDebug() <<  oidstr << " - " << metric_extractor.run_metrics();
+    qDebug() <<  oidstr << " - " << metric_extractor.run_metrics(oidstr);
 
     // Free git objects
     git_tree_free(tree);

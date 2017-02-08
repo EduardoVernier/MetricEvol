@@ -7,12 +7,15 @@
 #include <QString>
 #include <QFile>
 #include <QTextStream>
+#include <string.h>
+
+using namespace std;
 
 class MetricExtractor
 {
 public:
     MetricExtractor();
-    QString run_metrics(char *cmt);
+		string run_metrics(char *cmt);
 
 private:
     QString exec(QString cmd);

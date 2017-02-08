@@ -9,37 +9,23 @@
 // Creating the directories makes it Unix compatible only - fix it later
 #include <sys/stat.h>
 #include <sys/types.h>
-
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
 
 Repository::Repository(char* repo_path, int _number_of_samples)
 {
+		repo_dir_path = repo_path;
     number_of_samples = _number_of_samples;
     // Time execution for reporting purposes
-    QTime t;
-    t.start();
 
     git_libgit2_init();
 
-    QRegularExpression re("\\w+.git$");
-    QRegularExpressionMatch match = re.match(repo_path);
-    if (match.hasMatch())
-    {
-        // Cloning repository to ./repo/
-        QString matched = match.captured(0);
-        const char *path = "./repo/";
-        int error = git_clone(&repo, repo_path, path, NULL);
-        check_error(error, "cloning repository");
-        qDebug("Time elapsed cloning: %fs\n", t.elapsed()/1000.0);
-    }
-    else
-    {
-        // Opening repository
-        int error = git_repository_open(&repo, repo_path);
-        check_error(error, "opening repository");
-        qDebug("Time elapsed opening: %fs", t.elapsed()/1000.0);
-    }
-
-    t.start();
+		// Opening repository
+		int error = git_repository_open(&repo, repo_path);
+		check_error(error, "opening repository");
 
     // Getting the repo object database
     git_odb *odb;
@@ -51,9 +37,6 @@ Repository::Repository(char* repo_path, int _number_of_samples)
     git_odb_free(odb);
     git_repository_free(repo);
     delete trie;
-
-    qDebug("Total time elapsed processing repository: %fs\n",(t.elapsed()/1000.0));
-
 }
 
 // Report error on qDebug
@@ -112,13 +95,27 @@ void Repository::walk_repository()
     // Iterate through commits and lookup file trees
     commit_order_index = 0;
     git_oid oid;
-    int collection_interval = floor(commit_count/(number_of_samples)); // e.g. collect one version every 200 commits
-    for (int i = 0; git_revwalk_next(&oid, walk) == 0; i++)
+		int collection_interval = 8;
+		for (int i = 0; git_revwalk_next(&oid, walk) == 0; i++)
     {
         if (i % collection_interval == 0)
         {
-            lookup_commit_file_tree(oid);
+						// lookup_commit_file_tree(oid);
             commit_order_index++;
+						string cmd = "cd ";
+						cmd += repo_dir_path;
+						cmd += "; ";
+						cmd += "git reset --hard ";
+						char oidstr[GIT_OID_HEXSZ+1] = {0};
+						git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, &oid);
+						cmd += oidstr;
+						cmd += "; ";
+						cmd += "cloc . --by-file --csv --out='../calcuta/";
+						char buffer [33];
+						sprintf(buffer, "%d", i/collection_interval);
+						cmd += buffer;
+						cmd += ".csv'";
+						system(cmd.c_str());
         }
     }
     git_revwalk_free(walk);
@@ -145,16 +142,16 @@ void Repository::lookup_commit_file_tree(git_oid oid)
     // Delete files removed from Vn-1 to Vn
     sort(Lf.begin(), Lf.end());
     sort(Lr.begin(), Lr.end());
-    vector<QString> difference;
-    set_difference(Lf.begin(), Lf.end(), Lr.begin(), Lr.end(), std::back_inserter(difference));
+//    vector<QString> difference;
+//    set_difference(Lf.begin(), Lf.end(), Lr.begin(), Lr.end(), std::back_inserter(difference));
 
-    for(vector<QString>::iterator it = difference.begin(); it != difference.end(); ++it)
-        remove(it->toUtf8());
+//    for(vector<QString>::iterator it = difference.begin(); it != difference.end(); ++it)
+//        remove(it->toUtf8());
     Lf = Lr;
     Lr.clear();
 
-    // Run metrics extraction and log id and time on qDebug
-    qDebug() <<  oidstr << " - " << metric_extractor.run_metrics(oidstr);
+		// Run metrics extraction and log id and time on qDebug
+		cout <<  oidstr << " - " << metric_extractor.run_metrics(oidstr);
 
     // Free git objects
     git_tree_free(tree);
@@ -177,12 +174,10 @@ void Repository::dfs_tree_walk(git_tree *tree)
         git_tree_entry_to_object(&objt, repo, entry);
         git_oid_tostr(oidstr, GIT_OID_HEXSZ+1, git_object_id(objt));
         const char *str_type = git_object_type2string(git_object_type(objt));
-        QString obj_str (git_tree_entry_name(entry));
+				QString obj_str (git_tree_entry_name(entry));
 
-        // Add all source files from version to Lr
-        QRegExp regex("^.+\\.(c|h|cpp|cc|java)$");
-        if (regex.exactMatch(obj_str))
-            Lr.push_back(obj_str);
+				// Add all source files from version to Lr
+						Lr.push_back(obj_str);
 
         // If file is already not downloaded (from previous commits)
         if(trie->searchSHA1(oidstr) == false)
@@ -202,12 +197,11 @@ void Repository::dfs_tree_walk(git_tree *tree)
             {
                 // Add file oid to trie even if not source file - prevents from re-downloading it
                 trie->addSHA1(oidstr);
-                // Match only C++ and Java source files
-                if(regex.exactMatch(obj_str))
-                {
-                    // Write file to a specific directory - later to be analysed
-                    write_blob(git_object_id(objt), obj_str);
-                }
+								// Match only C++ and Java source files
+
+										// Write file to a specific directory - later to be analysed
+										write_blob(git_object_id(objt), obj_str);
+
             }
         }
         git_object_free(objt);

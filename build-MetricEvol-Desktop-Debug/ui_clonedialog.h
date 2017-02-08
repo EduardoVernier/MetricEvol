@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'clonedialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.2
+** Created by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,16 +10,16 @@
 #define UI_CLONEDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -36,31 +36,31 @@ public:
     void setupUi(QDialog *CloneDialog)
     {
         if (CloneDialog->objectName().isEmpty())
-            CloneDialog->setObjectName(QStringLiteral("CloneDialog"));
+            CloneDialog->setObjectName(QString::fromUtf8("CloneDialog"));
         CloneDialog->resize(400, 163);
         widget = new QWidget(CloneDialog);
-        widget->setObjectName(QStringLiteral("widget"));
+        widget->setObjectName(QString::fromUtf8("widget"));
         widget->setGeometry(QRect(20, 20, 371, 131));
         verticalLayout = new QVBoxLayout(widget);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(widget);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         verticalLayout->addWidget(label);
 
         label_2 = new QLabel(widget);
-        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setObjectName(QString::fromUtf8("label_2"));
 
         verticalLayout->addWidget(label_2);
 
         lineEdit = new QLineEdit(widget);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
+        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
 
         verticalLayout->addWidget(lineEdit);
 
         buttonBox = new QDialogButtonBox(widget);
-        buttonBox->setObjectName(QStringLiteral("buttonBox"));
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
@@ -76,9 +76,9 @@ public:
 
     void retranslateUi(QDialog *CloneDialog)
     {
-        CloneDialog->setWindowTitle(QApplication::translate("CloneDialog", "Dialog", 0));
-        label->setText(QApplication::translate("CloneDialog", "Enter Repository URL:", 0));
-        label_2->setText(QApplication::translate("CloneDialog", "E.g. git://github.com/author/repo.git", 0));
+        CloneDialog->setWindowTitle(QApplication::translate("CloneDialog", "Dialog", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("CloneDialog", "Enter Repository URL:", 0, QApplication::UnicodeUTF8));
+        label_2->setText(QApplication::translate("CloneDialog", "E.g. git://github.com/author/repo.git", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

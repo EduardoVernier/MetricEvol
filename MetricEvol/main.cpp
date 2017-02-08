@@ -1,11 +1,10 @@
-#include "mainwindow.h"
-#include <QApplication>
-
+#include "repository.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
-    return a.exec();
+	string fileName = "/home/eduardo/Desktop/calcuta-android-mirror/";
+	char path[256];
+	strcpy(path, fileName.c_str());
+
+	Repository repository(path, 0);
 }

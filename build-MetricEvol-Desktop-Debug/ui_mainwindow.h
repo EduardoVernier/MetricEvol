@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.4.2
+** Created by: Qt User Interface Compiler version 4.8.7
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,19 +10,19 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QToolBar>
-#include <QtWidgets/QWidget>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QButtonGroup>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QHeaderView>
+#include <QtGui/QLabel>
+#include <QtGui/QMainWindow>
+#include <QtGui/QMenu>
+#include <QtGui/QMenuBar>
+#include <QtGui/QSpinBox>
+#include <QtGui/QStatusBar>
+#include <QtGui/QToolBar>
+#include <QtGui/QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -44,29 +44,29 @@ public:
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
-            MainWindow->setObjectName(QStringLiteral("MainWindow"));
+            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(465, 215);
         openRepoMenuBar = new QAction(MainWindow);
-        openRepoMenuBar->setObjectName(QStringLiteral("openRepoMenuBar"));
+        openRepoMenuBar->setObjectName(QString::fromUtf8("openRepoMenuBar"));
         cloneRepoMenuBar = new QAction(MainWindow);
-        cloneRepoMenuBar->setObjectName(QStringLiteral("cloneRepoMenuBar"));
+        cloneRepoMenuBar->setObjectName(QString::fromUtf8("cloneRepoMenuBar"));
         centralWidget = new QWidget(MainWindow);
-        centralWidget->setObjectName(QStringLiteral("centralWidget"));
+        centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         widget = new QWidget(centralWidget);
-        widget->setObjectName(QStringLiteral("widget"));
+        widget->setObjectName(QString::fromUtf8("widget"));
         widget->setGeometry(QRect(50, 20, 247, 29));
         horizontalLayout = new QHBoxLayout(widget);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(0, 0, 0, 0);
         label = new QLabel(widget);
-        label->setObjectName(QStringLiteral("label"));
+        label->setObjectName(QString::fromUtf8("label"));
 
         horizontalLayout->addWidget(label);
 
         n_samples = new QSpinBox(widget);
-        n_samples->setObjectName(QStringLiteral("n_samples"));
+        n_samples->setObjectName(QString::fromUtf8("n_samples"));
         n_samples->setMaximum(1000);
         n_samples->setValue(10);
 
@@ -74,16 +74,16 @@ public:
 
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
-        menuBar->setObjectName(QStringLiteral("menuBar"));
+        menuBar->setObjectName(QString::fromUtf8("menuBar"));
         menuBar->setGeometry(QRect(0, 0, 465, 25));
         menuOpen = new QMenu(menuBar);
-        menuOpen->setObjectName(QStringLiteral("menuOpen"));
+        menuOpen->setObjectName(QString::fromUtf8("menuOpen"));
         MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
-        mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
+        mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
         statusBar = new QStatusBar(MainWindow);
-        statusBar->setObjectName(QStringLiteral("statusBar"));
+        statusBar->setObjectName(QString::fromUtf8("statusBar"));
         MainWindow->setStatusBar(statusBar);
 
         menuBar->addAction(menuOpen->menuAction());
@@ -98,11 +98,11 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
-        openRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0));
-        cloneRepoMenuBar->setText(QApplication::translate("MainWindow", "Clone new repository", 0));
-        label->setText(QApplication::translate("MainWindow", "Number of Versions ", 0));
-        menuOpen->setTitle(QApplication::translate("MainWindow", "FIle", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
+        openRepoMenuBar->setText(QApplication::translate("MainWindow", "Open new repository", 0, QApplication::UnicodeUTF8));
+        cloneRepoMenuBar->setText(QApplication::translate("MainWindow", "Clone new repository", 0, QApplication::UnicodeUTF8));
+        label->setText(QApplication::translate("MainWindow", "Number of Versions ", 0, QApplication::UnicodeUTF8));
+        menuOpen->setTitle(QApplication::translate("MainWindow", "FIle", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

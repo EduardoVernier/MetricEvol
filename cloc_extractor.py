@@ -31,11 +31,11 @@ if __name__ == "__main__":
         if (options.all):
             commits =  os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | sort -nr | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
         elif (options.daily):
-            commits =  os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | awk \'{ if (y!=$1 || m!=$2 || d!=$3) { y=$1; m=$2; d=$3; last=$0; print $0 } else  { print last }}\' | sort -nr | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
+            commits =  os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | sort -nr | awk \'{ if (y!=$1 || m!=$2 || d!=$3) { y=$1; m=$2; d=$3; last=$0; print $0 } else  { print last }}\' | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
         elif (options.monthly):
-            commits = os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | awk \'{ if (y!=$1 || m!=$2) { y=$1; m=$2; last=$0; print $0 } else  { print last }}\' | sort -nr | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
+            commits = os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | sort -nr | awk \'{ if (y!=$1 || m!=$2) { y=$1; m=$2; last=$0; print $0 } else  { print last }}\' | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
         elif (options.monthly):
-            commits = os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | awk \'{ if (y!=$1) { y=$1; last=$0; print $0 } else  { print last }}\' | sort -nr | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
+            commits = os.popen("git log master --pretty=format:\"%cd %H\" --date=format:\'%Y %m %d\' | sort -nr | awk \'{ if (y!=$1) { y=$1; last=$0; print $0 } else  { print last }}\' | uniq -c | sed -e \'s/^ *\\([0-9]\\+\\) \\(.\\+\\)/\\2 \\1/\'").read().split("\n")
 
         for commitIndex in range(len(commits)):
             commit = commits[commitIndex]

@@ -68,7 +68,7 @@ if __name__ == "__main__":
             i = 0
             for item in reader:
                 if (item[0] != 'language'):
-                    ids.append(item[1][2:])
+                    ids.append(item[1])
                     loc.append(int(item[2])+int(item[3])+int(item[4]))
             f.close()
 
